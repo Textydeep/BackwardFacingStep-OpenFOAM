@@ -1,0 +1,18 @@
+# OpenFOAM mesh (regenerate with: blockMesh)
+constant/polyMesh/
+
+# VTK exports (regenerate with: foamToVTK)
+VTK/
+
+# Processor directories (parallel runs)
+processor*/
+
+# Large log files (keep only the main solver log)
+log.*
+!log.simpleFoam
+
+# Reconstructed fields
+reconstructed/
+
+# Compressed fields
+*.gz

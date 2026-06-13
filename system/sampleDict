@@ -1,0 +1,13 @@
+FoamFile { version 2.0; format ascii; class dictionary; object sampleDict; }
+type            sets;
+libs            (sampling);
+interpolationScheme cellPoint;
+setFormat       raw;
+fields          (U p);
+sets
+{
+    x1h  { type lineCell; axis y; start (0.01 0.001 0.0005); end (0.01 0.019 0.0005); }
+    x4h  { type lineCell; axis y; start (0.04 0.001 0.0005); end (0.04 0.019 0.0005); }
+    x6h  { type lineCell; axis y; start (0.06 0.001 0.0005); end (0.06 0.019 0.0005); }
+    x10h { type lineCell; axis y; start (0.10 0.001 0.0005); end (0.10 0.019 0.0005); }
+}

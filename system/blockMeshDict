@@ -1,0 +1,140 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//
+// Backward-Facing Step
+//
+//   h  = 0.01 m  (step height)
+//   4h upstream inlet channel (height h, from y=h to y=2h)
+//   30h downstream channel   (height 2h, from y=0 to y=2h)
+//
+//         3--------------------2
+//         |   Block 0         |
+//   inlet |   (upstream)      | 1-----------4----------5  topWall
+//  -------0-------------------+             |  Block 1 |
+//                             |  Block 2    |          |
+//                stepWall --> 6-------------7----------+  outlet
+//                             |  bottomWall            |
+//
+//  Vertex numbering (z=0 plane):
+//   0: (-0.04,  0.01, 0)
+//   1: ( 0.00,  0.01, 0)   step corner
+//   2: ( 0.00,  0.02, 0)
+//   3: (-0.04,  0.02, 0)
+//   4: ( 0.30,  0.01, 0)
+//   5: ( 0.30,  0.02, 0)
+//   6: ( 0.00,  0.00, 0)   step toe
+//   7: ( 0.30,  0.00, 0)
+//  8-15: same but z=0.001
+
+scale 1;
+
+vertices
+(
+    // z = 0 plane
+    (-0.04  0.01  0.000)   //  0
+    ( 0.00  0.01  0.000)   //  1
+    ( 0.00  0.02  0.000)   //  2
+    (-0.04  0.02  0.000)   //  3
+    ( 0.30  0.01  0.000)   //  4
+    ( 0.30  0.02  0.000)   //  5
+    ( 0.00  0.00  0.000)   //  6
+    ( 0.30  0.00  0.000)   //  7
+
+    // z = 0.001 plane
+    (-0.04  0.01  0.001)   //  8
+    ( 0.00  0.01  0.001)   //  9
+    ( 0.00  0.02  0.001)   // 10
+    (-0.04  0.02  0.001)   // 11
+    ( 0.30  0.01  0.001)   // 12
+    ( 0.30  0.02  0.001)   // 13
+    ( 0.00  0.00  0.001)   // 14
+    ( 0.30  0.00  0.001)   // 15
+);
+
+blocks
+(
+    // Block 0: upstream channel  (4h x h x dz)  40 x 40 x 1
+    hex (0 1 2 3 8 9 10 11)   (40 40 1)  simpleGrading (1 1 1)
+
+    // Block 1: upper downstream  (30h x h x dz)  300 x 40 x 1
+    hex (1 4 5 2 9 12 13 10)  (300 40 1) simpleGrading (1 1 1)
+
+    // Block 2: lower downstream  (30h x h x dz)  300 x 40 x 1
+    hex (6 7 4 1 14 15 12 9)  (300 40 1) simpleGrading (1 1 1)
+);
+
+boundary
+(
+    inlet
+    {
+        type patch;
+        faces ( (0 8 11 3) );
+    }
+
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (4 5 13 12)
+            (7 4 12 15)
+        );
+    }
+
+    topWall
+    {
+        type wall;
+        faces
+        (
+            (3 11 10 2)
+            (2 10 13 5)
+        );
+    }
+
+    bottomWall
+    {
+        type wall;
+        faces ( (6 7 15 14) );
+    }
+
+    stepWall
+    {
+        type wall;
+        faces ( (6 14 9 1) );
+    }
+
+    stepTop
+    {
+        type wall;
+        faces ( (0 1 9 8) );
+    }
+
+    frontAndBack
+    {
+        type empty;
+        faces
+        (
+            (0 3 2 1)
+            (1 2 5 4)
+            (6 1 4 7)
+            (8 9 10 11)
+            (9 12 13 10)
+            (14 15 12 9)
+        );
+    }
+);
+
+// ************************************************************************* //
